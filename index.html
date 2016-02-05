@@ -6,14 +6,18 @@
 	<title>K-means</title>
 </head>
 <body>
-	<canvas id="canvas"> 
-		il fuat d'utiliser un modern navigateur (Chrome, Firefox, Opera...)
-	</canvas>
 	<div class="options">
-		<button id="next">Suivant</button><br>
-		<label for="elements">N, le nombre de elements</label><input id="elements" type="text"><br>
-		<label for="k">K, le nombre de clusters</label><input id="k" type="text"><br>
+		<button id="cluster">Classer</button>
+		<button id="center" disabled="true">Centrer</button>
+		<button id="restart">Initialiser</button><br>
+		<!-- <button id="draw">Draw</button><br> -->
+		<label for="elements">N, les elements (objets, points)</label><input id="elements" type="text" value="50"><br>
+		<label for="k">K, les classes</label><input id="k" type="text" value="3"><br>
 	</div>
+	<div class="clearfix"></div>
+	<canvas id="canvas"> 
+	Il faut d'utiliser un moderne navigateur (Chrome, Firefox, Opera...)
+	</canvas>
 <script type="text/javascript" src="lib.js"></script>
 <script type="text/javascript" src="app.js"></script>
 </body>

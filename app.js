@@ -1,17 +1,19 @@
 var canvas = window.document.getElementById('canvas');
 	ctx = canvas.getContext('2d');
-	canvas.height = height = window.innerHeight;
-	canvas.width = width = window.innerWidth;
+	canvas.height = height = window.innerHeight - 50;
+	canvas.width = width = window.innerWidth - 50;
 
-	ELEMENTS = 12,
-	ELEMENT_RADIUS = 10,
+	ELEMENTS = 50,
+	ELEMENT_RADIUS = 15,
 	CENTER_RADIUS = 5,
 	PADDING = 300,
-	DEFAULT_ELEMENT_COLOR = '#FFF',
+	DEFAULT_ELEMENT_COLOR = '#333',
 	K = 3,
 	centers = [],
 	clusters = [],
-	elements = [];
+	elements = [],
+	clusterOrCenter=1;
+
 
 	window.requestAnimFrame = (function(callback) {
 	  return window.requestAnimationFrame 		||
@@ -25,36 +27,17 @@ var canvas = window.document.getElementById('canvas');
 	})();
 
 
-// element class 
-function Element(x, y){
-	this.x = x;
-	this.y = y;
-	this.r = ELEMENT_RADIUS;
-	this.cluster =0; // numero de classe
-	this.color = DEFAULT_ELEMENT_COLOR;
-	this.label = '';
+function init(){
+		K = document.getElementById("k").value;
+		ELEMENTS = document.getElementById("elements").value;
+		document.getElementById("center").disabled = true;
+		document.getElementById("cluster").disabled = false;
+		elements = [];
+		centers = [];
+		clusters = [];
+
 };
-function Center(x, y){
-	this.x = x;
-	this.y = y;
-	this.r = CENTER_RADIUS;
-	this.cluster =0; // numero de classe
-	this.color = '';
-};
-Center.prototype.draw = function(){
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.closePath();
-};
-Element.prototype.draw = function(){
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.closePath();
-};
+
 function elementsInit(){
 	for(var e=0; e<ELEMENTS; e++){
 		var x = Math.floor(Math.random() * (width - PADDING)+100);
@@ -63,12 +46,14 @@ function elementsInit(){
 	}
 };
 function centersCompute(){
+	clusters = [];
 	for(var i=1; i<=K; i++){
 		 clusters.push(
 		 	elements.filter(function(e){ return e.cluster == i;})
 		);
 	}
-	var len = clusters.length;
+	console.log(clusters);
+	var len = K;
 	var _len=0;
 	var sum_x=0, sum_y=0;
 	for(var i=0; i<len; i++){
@@ -79,14 +64,12 @@ function centersCompute(){
 		for(var y=0; y<_len; y++){
 			sum_y += clusters[i][y].y;
 		}
-		console.log('center li kan : ', centers[i], '_len = ', _len);
+		// console.log(i);
+		console.log("x : "+_len+" / "+sum_x+" = "+(sum_x/_len));
 		centers[i].x = sum_x/_len;
 		centers[i].y = sum_y/_len;
 		sum_x=0; sum_y=0;
-		console.log('center li ja : ', centers[i]);
 	}
-	console.log('clusters', clusters);
-	console.log('centers', centers);
 };
 function centersInit(){
 	for(var c=1; c<=K; c++){
@@ -97,7 +80,6 @@ function centersInit(){
 			center.cluster = c; 
 		centers.push(center);
 	}
-	console.log(centers);
 	// console.log(centers);
 };
 
@@ -112,6 +94,7 @@ function elementsClustering(){
 				temp.push(distance(elements[e], centers[c]));
 			}
 			i = temp.indexOf(getMinOfArray(temp));
+			// console.log(temp[i]);
 			elements[e].cluster = centers[i].cluster;
 			elements[e].color = centers[i].color;
 			temp = [];
@@ -129,10 +112,11 @@ function drawElements(){
 	var len = elements.length;
 	for(var e=0; e<len; e++){
 		ctx.fillStyle = elements[e].color;
-		console.log(elements[e]);
+		// console.log(elements[e]);
 		elements[e].draw();
 		ctx.font='10px Tahoma';
 		ctx.fillStyle = 'white';
+		elements[e].label = "C"+elements[e].cluster;
 		ctx.fillText(elements[e].label,elements[e].x-5,elements[e].y+5);
 		// console.log(elements[e]);
 	}
@@ -141,31 +125,42 @@ function showClustersColors(){
 	var len = centers.length;
 	for(var i=0; i<len; i++){
 		ctx.beginPath();
-		ctx.arc((30*i)+30, height-10, 20, 0, 2*Math.PI);
+		ctx.arc((30*i)+30, 50, 20, 0, 2*Math.PI);
 		ctx.fillStyle = centers[i].color;
 		ctx.fill();
 		ctx.closePath();
 		ctx.font='10px Tahoma';
 		ctx.fillStyle = 'white';
-		ctx.fillText('C'+(i+1),(30*i)+30,height-10);
+		ctx.fillText('C'+(i+1),(30*i)+30,50);
 	}
 };
-function start(){
-
+function draw(){
+	ctx.fillStyle = '#FFF';
+	ctx.fillRect(0, 0, width, height);
 	drawElements();
 	drawCenters();
 	showClustersColors();
-	document.getElementById("next").addEventListener("click", function(){	
-		elementsClustering();
-		drawElements();
-		centersCompute();
-		drawCenters();
-	});
 };
+function start(){
+	init();
 	elementsInit();
 	centersInit();
-	//console.log(elements);
-	start();
-	//console.log(elements);
-	
+	draw();
+	document.getElementById("cluster").addEventListener("click", function(){
+		document.getElementById("center").disabled = false;
+		document.getElementById("cluster").disabled = true;
+		elementsClustering();
+		draw();
+	});
+	document.getElementById("center").addEventListener("click", function(){
+		document.getElementById("center").disabled = true;
+		document.getElementById("cluster").disabled = false;
+		centersCompute();
+		draw();
+
+	});
   // window.requestAnimationFrame(start);
+
+};
+document.getElementById("restart").addEventListener("click", start);
+	
