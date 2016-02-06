@@ -19,34 +19,14 @@ function getMaxOfArray(numArray) {
 function getMinOfArray(numArray) {
   return Math.min.apply(null, numArray);
 };
-// element class 
-function Element(x, y){
-	this.x = x;
-	this.y = y;
-	this.r = ELEMENT_RADIUS;
-	this.cluster =0; // numero de classe
-	this.color = DEFAULT_ELEMENT_COLOR;
-	this.label = '';
-};
-function Center(x, y){
-	this.x = x;
-	this.y = y;
-	this.r = CENTER_RADIUS;
-	this.cluster =0; // numero de classe
-	this.color = '';
-};
-Center.prototype.draw = function(){
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.stroke();
-	ctx.closePath();
-};
-Element.prototype.draw = function(){
-	ctx.beginPath();
-	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
-	ctx.fillStyle = this.color;
-	ctx.fill();
-	ctx.closePath();
-};
+
+window.requestAnimFrame = (function(callback) {
+  return window.requestAnimationFrame 		||
+   		 window.webkitRequestAnimationFrame ||
+   		 window.mozRequestAnimationFrame 	||
+   		 window.oRequestAnimationFrame 		||
+   		 window.msRequestAnimationFrame 	||
+  function(callback) {
+    window.setTimeout(callback, 1000 / 60);
+  };
+})();

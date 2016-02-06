@@ -1,12 +1,14 @@
-var canvas = window.document.getElementById('canvas');
+var canvas = window.document.getElementById('canvas'),
 	ctx = canvas.getContext('2d');
 	canvas.height = height = window.innerHeight - 50;
 	canvas.width = width = window.innerWidth - 50;
-
+var
+	clusterBtn = document.getElementById("cluster"),
+	centerBtn = document.getElementById("center"),
 	ELEMENTS = 50,
 	ELEMENT_RADIUS = 15,
 	CENTER_RADIUS = 5,
-	PADDING = 300,
+	PADDING = 200,
 	DEFAULT_ELEMENT_COLOR = '#333',
 	K = 3,
 	centers = [],
@@ -14,28 +16,55 @@ var canvas = window.document.getElementById('canvas');
 	elements = [],
 	clusterOrCenter=1;
 
-
-	window.requestAnimFrame = (function(callback) {
-	  return window.requestAnimationFrame 		||
-	   		 window.webkitRequestAnimationFrame ||
-	   		 window.mozRequestAnimationFrame 	||
-	   		 window.oRequestAnimationFrame 		||
-	   		 window.msRequestAnimationFrame 	||
-	  function(callback) {
-	    window.setTimeout(callback, 1000 / 60);
-	  };
-	})();
-
+// element class 
+function Element(x, y){
+	this.x = x;
+	this.y = y;
+	this.r = ELEMENT_RADIUS;
+	this.cluster =0; // numero de classe
+	this.color = DEFAULT_ELEMENT_COLOR;
+	this.label = '';
+};
+function Center(x, y){
+	this.x = x;
+	this.y = y;
+	this.r = CENTER_RADIUS;
+	this.cluster =0; // numero de classe
+	this.color = '';
+};
+Center.prototype.draw = function(){
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+	ctx.fillStyle = this.color;
+	ctx.fill();
+	ctx.stroke();
+	ctx.closePath();
+};
+Element.prototype.draw = function(){
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+	ctx.fillStyle = this.color;
+	ctx.fill();
+	ctx.closePath();
+};
 
 function init(){
-		K = document.getElementById("k").value;
-		ELEMENTS = document.getElementById("elements").value;
-		document.getElementById("center").disabled = true;
-		document.getElementById("cluster").disabled = false;
-		elements = [];
-		centers = [];
-		clusters = [];
-
+	K = document.getElementById("k").value;
+	ELEMENTS = document.getElementById("elements").value;
+	centerBtn.disabled = true;
+	clusterBtn.disabled = false;
+	elements = [];
+	centers = [];
+	clusters = [];
+	nbrIteration = 0;
+	// document.getElementById("iteration").value = 0;
+	var infos = document.getElementsByClassName("clusters");
+	infos[0].innerHTML = "";
+	for (var i=1; i <= K; i++) {
+		var c = document.createElement("span");
+		c.innerHTML = "Classe "+i+" = 0";
+		infos[0].appendChild(c);
+	};
 };
 
 function elementsInit(){
@@ -52,7 +81,6 @@ function centersCompute(){
 		 	elements.filter(function(e){ return e.cluster == i;})
 		);
 	}
-	console.log(clusters);
 	var len = K;
 	var _len=0;
 	var sum_x=0, sum_y=0;
@@ -64,8 +92,7 @@ function centersCompute(){
 		for(var y=0; y<_len; y++){
 			sum_y += clusters[i][y].y;
 		}
-		// console.log(i);
-		console.log("x : "+_len+" / "+sum_x+" = "+(sum_x/_len));
+		// console.log("x : "+_len+" / "+sum_x+" = "+(sum_x/_len));
 		centers[i].x = sum_x/_len;
 		centers[i].y = sum_y/_len;
 		sum_x=0; sum_y=0;
@@ -80,7 +107,6 @@ function centersInit(){
 			center.cluster = c; 
 		centers.push(center);
 	}
-	// console.log(centers);
 };
 
 
@@ -94,7 +120,6 @@ function elementsClustering(){
 				temp.push(distance(elements[e], centers[c]));
 			}
 			i = temp.indexOf(getMinOfArray(temp));
-			// console.log(temp[i]);
 			elements[e].cluster = centers[i].cluster;
 			elements[e].color = centers[i].color;
 			temp = [];
@@ -105,34 +130,56 @@ function drawCenters(){
 	for(var c=0; c<len; c++){
 		ctx.fillStyle = centers[c].color;
 		centers[c].draw();
-		// console.log(elements[e]);
 	}
 };
 function drawElements(){
 	var len = elements.length;
 	for(var e=0; e<len; e++){
 		ctx.fillStyle = elements[e].color;
-		// console.log(elements[e]);
 		elements[e].draw();
 		ctx.font='10px Tahoma';
 		ctx.fillStyle = 'white';
-		elements[e].label = "C"+elements[e].cluster;
+		if(elements[e].cluster > 0){
+			elements[e].label = "C"+elements[e].cluster;
+		}
 		ctx.fillText(elements[e].label,elements[e].x-5,elements[e].y+5);
-		// console.log(elements[e]);
 	}
 };
 function showClustersColors(){
 	var len = centers.length;
 	for(var i=0; i<len; i++){
 		ctx.beginPath();
-		ctx.arc((30*i)+30, 50, 20, 0, 2*Math.PI);
+		ctx.arc((30*i*2)+15, 30, 20, 0, 2*Math.PI);
 		ctx.fillStyle = centers[i].color;
 		ctx.fill();
 		ctx.closePath();
 		ctx.font='10px Tahoma';
 		ctx.fillStyle = 'white';
-		ctx.fillText('C'+(i+1),(30*i)+30,50);
+		ctx.fillText('C'+(i+1),(30*i*2)+10,35);
 	}
+};
+function updateCentersDOM(){
+
+};
+function updateClustersDOM(){
+	var _clusters = [];
+
+	for(var i=1; i<=K; i++){
+		 _clusters.push(
+		 	elements.filter(function(e){ return e.cluster == i;})
+		);
+	}
+	var clustersDOM = document.getElementsByClassName("clusters");
+	for (var i=1; i <= K; i++) {
+		// console.log(clustersDOM[0]);
+		clustersDOM[0].children[i-1].style= "color : "+centers[i-1].color;
+		clustersDOM[0].children[i-1].innerHTML = "Classe "+i+" = "+_clusters[i-1].length; 
+	};
+
+};
+function updateDOM(){
+	//updateCentersDOM();
+	updateClustersDOM();
 };
 function draw(){
 	ctx.fillStyle = '#FFF';
@@ -142,24 +189,23 @@ function draw(){
 	showClustersColors();
 };
 function start(){
-	init();
-	elementsInit();
-	centersInit();
-	draw();
-	document.getElementById("cluster").addEventListener("click", function(){
-		document.getElementById("center").disabled = false;
-		document.getElementById("cluster").disabled = true;
+		init();
+		elementsInit();
+		centersInit();
+		draw();
+		clusterBtn.addEventListener("click", function(){
+		centerBtn.disabled = false;
+		clusterBtn.disabled = true;
 		elementsClustering();
 		draw();
+		updateDOM();
 	});
-	document.getElementById("center").addEventListener("click", function(){
-		document.getElementById("center").disabled = true;
-		document.getElementById("cluster").disabled = false;
+	centerBtn.addEventListener("click", function(){
+		centerBtn.disabled = true;
+		clusterBtn.disabled = false;
 		centersCompute();
 		draw();
-
 	});
-  // window.requestAnimationFrame(start);
 
 };
 document.getElementById("restart").addEventListener("click", start);

@@ -7,12 +7,16 @@
 </head>
 <body>
 	<div class="options">
-		<button id="cluster">Classer</button>
+		<button id="cluster" disabled="true">Classer</button>
 		<button id="center" disabled="true">Centrer</button>
 		<button id="restart">Initialiser</button><br>
 		<!-- <button id="draw">Draw</button><br> -->
 		<label for="elements">N, les elements (objets, points)</label><input id="elements" type="text" value="50"><br>
 		<label for="k">K, les classes</label><input id="k" type="text" value="3"><br>
+	</div>
+	<div class="infos">
+		<p>Nombre d'elements de chaque classe : </p>
+		<div class="clusters"></div>
 	</div>
 	<div class="clearfix"></div>
 	<canvas id="canvas"> 

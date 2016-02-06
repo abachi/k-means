@@ -2,9 +2,7 @@
 	margin: 0;
 	padding: 0;
 }
-body{
 
-}
 button, input{
 	border-radius: 3px;
 	border: 1px solid #333;
@@ -23,9 +21,18 @@ button{
 	overflow: hidden;
 	float: left;
 	margin: 10px;
+	margin-right: 50px;
 }
-.next{
-	margin:20px;
+.infos{
+	overflow: hidden;
+	padding-top: 20px;
+}
+.infos p{
+	margin-bottom: 5px;
+}
+.infos span{
+	display: inline-block;
+	margin: 5px 15px;
 }
 input[type="text"]{
 	width: 50px;
