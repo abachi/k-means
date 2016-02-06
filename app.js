@@ -16,12 +16,11 @@ var
 	elements = [],
 	clusterOrCenter=1;
 
-// element class 
 function Element(x, y){
 	this.x = x;
 	this.y = y;
 	this.r = ELEMENT_RADIUS;
-	this.cluster =0; // numero de classe
+	this.cluster = 0;
 	this.color = DEFAULT_ELEMENT_COLOR;
 	this.label = '';
 };
@@ -29,7 +28,7 @@ function Center(x, y){
 	this.x = x;
 	this.y = y;
 	this.r = CENTER_RADIUS;
-	this.cluster =0; // numero de classe
+	this.cluster = 0;
 	this.color = '';
 };
 Center.prototype.draw = function(){
@@ -56,8 +55,6 @@ function init(){
 	elements = [];
 	centers = [];
 	clusters = [];
-	nbrIteration = 0;
-	// document.getElementById("iteration").value = 0;
 	var infos = document.getElementsByClassName("clusters");
 	infos[0].innerHTML = "";
 	for (var i=1; i <= K; i++) {
@@ -92,7 +89,6 @@ function centersCompute(){
 		for(var y=0; y<_len; y++){
 			sum_y += clusters[i][y].y;
 		}
-		// console.log("x : "+_len+" / "+sum_x+" = "+(sum_x/_len));
 		centers[i].x = sum_x/_len;
 		centers[i].y = sum_y/_len;
 		sum_x=0; sum_y=0;
@@ -171,14 +167,12 @@ function updateClustersDOM(){
 	}
 	var clustersDOM = document.getElementsByClassName("clusters");
 	for (var i=1; i <= K; i++) {
-		// console.log(clustersDOM[0]);
 		clustersDOM[0].children[i-1].style= "color : "+centers[i-1].color;
 		clustersDOM[0].children[i-1].innerHTML = "Classe "+i+" = "+_clusters[i-1].length; 
 	};
 
 };
 function updateDOM(){
-	//updateCentersDOM();
 	updateClustersDOM();
 };
 function draw(){
