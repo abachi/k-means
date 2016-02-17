@@ -1,3 +1,6 @@
+/**
+* @author Abachi nasser
+*/
 var canvas = window.document.getElementById('canvas'),
 	ctx = canvas.getContext('2d');
 	canvas.height = height = window.innerHeight - 50;
@@ -13,8 +16,7 @@ var
 	K = 3,
 	centers = [],
 	clusters = [],
-	elements = [],
-	clusterOrCenter=1;
+	elements = [];
 
 function Element(x, y){
 	this.x = x;
@@ -46,7 +48,6 @@ Element.prototype.draw = function(){
 	ctx.fill();
 	ctx.closePath();
 };
-
 function init(){
 	K = document.getElementById("k").value;
 	ELEMENTS = document.getElementById("elements").value;
@@ -104,8 +105,6 @@ function centersInit(){
 		centers.push(center);
 	}
 };
-
-
 function elementsClustering(){
 	var e_len = elements.length,
 		c_len = centers.length,
@@ -159,7 +158,6 @@ function updateCentersDOM(){
 };
 function updateClustersDOM(){
 	var _clusters = [];
-
 	for(var i=1; i<=K; i++){
 		 _clusters.push(
 		 	elements.filter(function(e){ return e.cluster == i;})
@@ -170,7 +168,6 @@ function updateClustersDOM(){
 		clustersDOM[0].children[i-1].style= "color : "+centers[i-1].color;
 		clustersDOM[0].children[i-1].innerHTML = "Classe "+i+" = "+_clusters[i-1].length; 
 	};
-
 };
 function updateDOM(){
 	updateClustersDOM();
@@ -182,6 +179,20 @@ function draw(){
 	drawCenters();
 	showClustersColors();
 };
+
+function drawLinesToCenters(){
+	var len = elements.length;
+	var c = 0;
+		for(var e=0; e<len; e++){
+			c =  elements[e].cluster-1;
+			ctx.beginPath();
+			ctx.moveTo(elements[e].x, elements[e].y);
+			ctx.lineTo(centers[c].x,centers[c].y);
+			ctx.strokeStyle = elements[e].color;
+			ctx.stroke();
+			ctx.closePath();
+		}
+};
 function start(){
 		init();
 		elementsInit();
@@ -192,6 +203,7 @@ function start(){
 		clusterBtn.disabled = true;
 		elementsClustering();
 		draw();
+		drawLinesToCenters();
 		updateDOM();
 	});
 	centerBtn.addEventListener("click", function(){
@@ -199,8 +211,9 @@ function start(){
 		clusterBtn.disabled = false;
 		centersCompute();
 		draw();
+		drawLinesToCenters();
+		
 	});
-
 };
 document.getElementById("restart").addEventListener("click", start);
 	
